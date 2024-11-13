@@ -32,7 +32,7 @@ namespace SeleniumCsharp
         {
             driver.Dispose();
         }
-        
+
         [Test]
         public void Test_progressBar()
         {
@@ -137,7 +137,20 @@ namespace SeleniumCsharp
             var yellowLabelValue = yellowLabel.Text.Split(':')[1].Trim();  
             Assert.AreEqual(chromeCpuLoadValue, yellowLabelValue, "CPU load value in the table does not match the yellow label value.");
         }
-        
 
+        [Test]
+        public void Test_AjaxDataLoading()
+        {
+            driver.Url = "http://www.uitestingplayground.com/ajax";
+
+            var ajaxButton = driver.FindElement(By.Id("ajaxButton"));
+            ajaxButton.Click();
+
+            var ajaxLoadedLabel = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(By.CssSelector("p.bg-success")));
+
+            Assert.IsTrue(ajaxLoadedLabel.Text.Contains("Data loaded with AJAX get request."), "Loaded label text does not match.");
+
+            ajaxLoadedLabel.Click();
+        }
     }
 }
