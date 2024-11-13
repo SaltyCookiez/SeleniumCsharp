@@ -23,7 +23,7 @@ namespace SeleniumCsharp
 
             driver = new FirefoxDriver("C:\\Users\\opilane\\source\\repos\\TARpe22\\Vider\\SeleniumCsharp\\SeleniumCsharp\\drivers", options);
 
-            wait = new WebDriverWait(driver, TimeSpan.FromSeconds(45));  
+            wait = new WebDriverWait(driver, TimeSpan.FromSeconds(45));
         }
 
         [TearDown]
@@ -71,6 +71,34 @@ namespace SeleniumCsharp
             alert.Accept();
 
             Assert.IsTrue(true, "Clicked on the primary button and handled the alert.");
+        }
+
+        [Test]
+        public void Test_hiddenLayerButtonClick()
+        {
+            driver.Url = "http://www.uitestingplayground.com/hiddenlayers";
+            var greenButton = driver.FindElement(By.Id("greenButton"));
+            greenButton.Click();
+
+            try
+            {
+                var overlay = driver.FindElement(By.CssSelector("div.spa-view[style*='z-index: 2']"));
+                wait.Until(driver => overlay.Displayed);
+
+                try
+                {
+                    greenButton.Click();
+                    Assert.Fail("The green button was clicked twice.");
+                }
+                catch (ElementClickInterceptedException)
+                {
+                    Assert.Pass("The green button could not be clicked twice, asa expected!");
+                }
+            }
+            catch (NoSuchElementException)
+            {
+                Assert.Fail("Overlay was not found.");
+            }
         }
 
     }
