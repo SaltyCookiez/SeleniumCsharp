@@ -152,5 +152,30 @@ namespace SeleniumCsharp
 
             ajaxLoadedLabel.Click();
         }
+
+        [Test]
+        public void Test_ClientSideDelay()
+        {
+            driver.Url = "http://www.uitestingplayground.com/clientdelay";
+
+            var clientDelayButton = driver.FindElement(By.Id("ajaxButton"));
+            clientDelayButton.Click();
+
+            try
+            {
+                var clientLoadedLabel = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(By.CssSelector("p.bg-success")));
+
+                Console.WriteLine("Actual loaded label text: " + clientLoadedLabel.Text);
+
+                Assert.IsTrue(clientLoadedLabel.Text.Contains("Data calculated on the client side."),"Loaded label text does not match.");
+
+                clientLoadedLabel.Click();
+            }
+            catch (WebDriverTimeoutException)
+            {
+                Assert.Fail("The client-side delayed label did not appear within the expected time frame.");
+            }
+        }
+
     }
 }
