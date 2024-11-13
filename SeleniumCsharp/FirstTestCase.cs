@@ -55,5 +55,23 @@ namespace SeleniumCsharp
 
             Assert.IsTrue(Math.Abs(finalProgressValue - 75) <= 5, $"Expected progress to be within 5% of 75, but got {finalProgressValue}%");
         }
+
+        [Test]
+        public void Test_classAttributeButtonClick()
+        {
+            driver.Url = "http://www.uitestingplayground.com/classattr";
+
+            var primaryButton = driver.FindElement(By.XPath("//button[contains(concat(' ', normalize-space(@class), ' '), ' btn-primary ')]"));
+            primaryButton.Click();
+
+            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+            wait.Until(drv => drv.SwitchTo().Alert() != null);
+
+            IAlert alert = driver.SwitchTo().Alert();
+            alert.Accept();
+
+            Assert.IsTrue(true, "Clicked on the primary button and handled the alert.");
+        }
+
     }
 }
