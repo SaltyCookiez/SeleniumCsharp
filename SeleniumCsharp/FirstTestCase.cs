@@ -2,6 +2,7 @@
 using OpenQA.Selenium;
 using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.Support.UI;
+using SeleniumExtras.WaitHelpers;
 using System;
 
 namespace SeleniumCsharp
@@ -31,7 +32,7 @@ namespace SeleniumCsharp
         {
             driver.Dispose();
         }
-
+        
         [Test]
         public void Test_progressBar()
         {
@@ -100,6 +101,43 @@ namespace SeleniumCsharp
                 Assert.Fail("Overlay was not found.");
             }
         }
+        
+        [Test]
+        public void Test_DynamicTable_CpuLoadComparison()
+        {
+            driver.Url = "http://www.uitestingplayground.com/dynamictable";
+            var table = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(By.CssSelector("div[role='table']")));
+            var headers = table.FindElements(By.CssSelector("span[role='columnheader']"));
+            var cpuLoadColumnIndex = -1;
+
+            for (int i = 0; i < headers.Count; i++)
+            {
+                if (headers[i].Text.Contains("CPU"))
+                {
+                    cpuLoadColumnIndex = i;
+                    break;
+                }
+            }
+            Assert.AreNotEqual(cpuLoadColumnIndex, -1, "CPU column not found.");
+
+            var rows = table.FindElements(By.CssSelector("div[role='rowgroup'] div[role='row']"));
+            string chromeCpuLoadValue = null;
+
+            foreach (var row in rows)
+            {
+                var cells = row.FindElements(By.CssSelector("span[role='cell']"));
+                if (cells.Count > 0 && cells[0].Text == "Chrome")  
+                {
+                    chromeCpuLoadValue = cells[cpuLoadColumnIndex].Text.Trim();
+                    break;
+                }
+            }
+            Assert.IsNotNull(chromeCpuLoadValue, "Chrome row not found.");
+            var yellowLabel = driver.FindElement(By.CssSelector("p.bg-warning"));
+            var yellowLabelValue = yellowLabel.Text.Split(':')[1].Trim();  
+            Assert.AreEqual(chromeCpuLoadValue, yellowLabelValue, "CPU load value in the table does not match the yellow label value.");
+        }
+        
 
     }
 }
